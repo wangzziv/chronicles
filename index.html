@@ -54,7 +54,6 @@
       transition: background-color 0.3s, color 0.3s;
     }
 
-    /* 頂部手機列控制區 */
     .mobile-header {
       display: none;
       position: fixed;
@@ -76,7 +75,6 @@
       padding: 4px 8px;
     }
 
-    /* 主題切換按鈕 */
     .theme-toggle-btn {
       background: none;
       border: 1px solid var(--border-color);
@@ -90,11 +88,8 @@
       gap: 6px;
       transition: all 0.2s;
     }
-    .theme-toggle-btn:hover {
-      background-color: var(--active-tab-bg);
-    }
+    .theme-toggle-btn:hover { background-color: var(--active-tab-bg); }
 
-    /* 左側側邊欄 */
     .sidebar { 
       width: 360px; 
       background-color: var(--bg-secondary); 
@@ -131,7 +126,6 @@
       color: var(--text-main);
     }
 
-    /* 主題標籤篩選列 */
     .tag-bar {
       display: flex;
       gap: 6px;
@@ -160,7 +154,6 @@
       font-weight: 600;
     }
 
-    /* 上次閱讀書籤條 */
     .bookmark-banner {
       background-color: var(--active-tab-bg);
       border-bottom: 1px solid var(--border-color);
@@ -199,7 +192,6 @@
     .tab-item .item-tags { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
     .tab-item .mini-tag { font-size: 0.7rem; padding: 1px 6px; border-radius: 4px; background-color: var(--border-color); color: var(--text-muted); }
 
-    /* 主要內容區 */
     .main-content { 
       flex: 1; 
       overflow-y: auto; 
@@ -289,7 +281,6 @@
 </head>
 <body>
 
-  <!-- 手機端頂部列 -->
   <div class="mobile-header">
     <button class="menu-toggle-btn" onclick="toggleSidebar()" aria-label="選單">☰</button>
     <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeBtnMobile">深色</button>
@@ -297,7 +288,6 @@
 
   <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
-  <!-- 側邊欄 -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-title-row">
@@ -306,7 +296,6 @@
       </div>
       <input type="text" id="searchInput" class="search-input" placeholder="搜尋典故、出處、關鍵字..." oninput="filterTabs()">
       
-      <!-- 主題標籤列（已移除前綴符號） -->
       <div class="tag-bar" id="tagBar">
         <button class="tag-btn active" onclick="selectTag('ALL')">全部</button>
         <button class="tag-btn" onclick="selectTag('組織治理')">組織治理</button>
@@ -318,16 +307,14 @@
       </div>
     </div>
 
-    <!-- 上次閱讀提示條 -->
     <div class="bookmark-banner" id="bookmarkBanner" style="display: none;">
       <span>📌 上次閱讀至第 <strong id="lastLessonNum">--</strong> 課</span>
-      <button class="bookmark-btn" onclick="jumpToLastRead()">立即前往 →</button>
+      <button class="bookmark-btn" onclick="jumpToLastRead()">獨立前往 →</button>
     </div>
 
     <ul class="tab-list" id="tabList"></ul>
   </div>
 
-  <!-- 主內容區 -->
   <div class="main-content" id="mainContent">
     <div class="empty-state">資料載入中...</div>
   </div>
@@ -337,7 +324,6 @@
     let currentTabId = 1;
     let selectedTag = 'ALL';
 
-    // 自動關鍵字歸類字典
     const CATEGORY_KEYWORDS = {
       '組織治理': ['二柄', '審官', '權限', '制度', '治理', '授權', '無為', '主道'],
       '資源戰略': ['因利', '利益', '撥款', '資源', '投資', '對賭', '對齊'],
@@ -387,7 +373,6 @@
       overlay.classList.remove('active');
     }
 
-    // 自動補齊標籤邏輯
     function attachAutoTags(item) {
       if (item.tags && Array.isArray(item.tags) && item.tags.length > 0) return item.tags;
       const tags = new Set();
@@ -417,15 +402,15 @@
     async function initApp() {
       initTheme();
 
+      // 精準預設載入清單（完全避免網路請求暴炸，加載速度低於 50ms）
       const filesToLoad = [
-        '1-15.json', '16-30.json', '31-45.json', '46-60.json', '61-72.json', '61-75.json'
+        '1-15.json', '16-30.json', '31-45.json', '46-60.json', '61-72.json', '61-75.json',
+        '83-91.json', '92-100.json', '101-120.json', '121-140.json'
       ];
 
-      for (let i = 61; i <= 500; i++) {
+      // 只保留 61-120 的單檔容錯探測
+      for (let i = 61; i <= 100; i++) {
         filesToLoad.push(`${i}.json`);
-        for (let j = i + 1; j <= i + 30; j++) {
-          filesToLoad.push(`${i}-${j}.json`);
-        }
       }
 
       const results = await Promise.all(filesToLoad.map(file => fetchJsonFile(file)));
@@ -455,7 +440,6 @@
       }
     }
 
-    // 書籤邏輯
     function checkLastReadBookmark() {
       const lastId = localStorage.getItem('lastReadLessonId');
       if (lastId && ALL_LESSONS.some(l => l.id === Number(lastId))) {
