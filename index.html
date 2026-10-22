@@ -19,6 +19,9 @@
       --app-bg: #f1f3f5;
       --mindset-bg: #f8f9fa;
       --shadow-color: rgba(0,0,0,0.04);
+      --tag-bg: #e9ecef;
+      --tag-active-bg: #2b2d42;
+      --tag-active-text: #ffffff;
     }
 
     [data-theme="dark"] {
@@ -35,6 +38,9 @@
       --app-bg: #2d3137;
       --mindset-bg: #1a1d21;
       --shadow-color: rgba(0,0,0,0.3);
+      --tag-bg: #2d2d2d;
+      --tag-active-bg: #90caf9;
+      --tag-active-text: #121212;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -105,7 +111,7 @@
       background-color: var(--bg-secondary); 
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
     .sidebar-title-row {
       display: flex;
@@ -113,16 +119,68 @@
       align-items: center;
     }
     .sidebar-header h2 { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+    
     .search-input { 
       width: 100%; 
       padding: 8px 12px; 
       border: 1px solid var(--border-color); 
       border-radius: 6px; 
-      font-size: 0.9rem; 
+      font-size: 0.88rem; 
       outline: none; 
       background-color: var(--bg-primary);
       color: var(--text-main);
     }
+
+    /* 主題標籤篩選列 */
+    .tag-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .tag-bar::-webkit-scrollbar { display: none; }
+    
+    .tag-btn {
+      background-color: var(--tag-bg);
+      color: var(--text-main);
+      border: none;
+      padding: 4px 10px;
+      border-radius: 14px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .tag-btn:hover { opacity: 0.85; }
+    .tag-btn.active {
+      background-color: var(--tag-active-bg);
+      color: var(--tag-active-text);
+      font-weight: 600;
+    }
+
+    /* 上次閱讀書籤條 */
+    .bookmark-banner {
+      background-color: var(--active-tab-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 8px 16px;
+      font-size: 0.82rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-main);
+    }
+    .bookmark-btn {
+      background: none;
+      border: none;
+      color: var(--active-tab-border);
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+      font-size: 0.82rem;
+    }
+
     .tab-list { flex: 1; overflow-y: auto; list-style: none; }
     .tab-item { 
       padding: 14px 16px; 
@@ -136,8 +194,10 @@
       border-left-color: var(--active-tab-border); 
       font-weight: 600; 
     }
-    .tab-item .lesson-num { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+    .tab-item .lesson-num { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; display: flex; justify-content: space-between; }
     .tab-item .lesson-title { font-size: 0.92rem; line-height: 1.4; color: var(--text-main); word-break: break-word; white-space: normal; }
+    .tab-item .item-tags { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+    .tab-item .mini-tag { font-size: 0.7rem; padding: 1px 6px; border-radius: 4px; background-color: var(--border-color); color: var(--text-muted); }
 
     /* 主要內容區 */
     .main-content { 
@@ -166,7 +226,10 @@
       color: var(--text-muted); 
       margin-bottom: 8px; 
     }
-    .meta-header h1 { font-size: 1.6rem; color: var(--text-main); }
+    .meta-header h1 { font-size: 1.6rem; color: var(--text-main); margin-bottom: 10px; }
+    .card-tags { display: flex; gap: 8px; margin-top: 8px; }
+    .card-tag-item { font-size: 0.8rem; padding: 3px 10px; border-radius: 12px; background-color: var(--active-tab-bg); color: var(--text-main); font-weight: 500; }
+
     .section-block { margin-bottom: 28px; }
     .section-title { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 12px; }
     .quote-box { 
@@ -197,7 +260,6 @@
     }
     .empty-state { text-align: center; padding: 60px; color: var(--text-muted); }
 
-    /* 遮罩背景 */
     .overlay {
       display: none;
       position: fixed;
@@ -206,35 +268,22 @@
       z-index: 850;
     }
 
-    /* RWD 響應式調整 */
     @media (max-width: 768px) {
       .mobile-header { display: flex; }
       body { padding-top: 56px; }
       .sidebar {
         position: fixed;
         top: 56px; bottom: 0; left: 0;
-        width: 280px;
+        width: 300px;
         transform: translateX(-100%);
         box-shadow: 4px 0 12px var(--shadow-color);
       }
-      .sidebar.open {
-        transform: translateX(0);
-      }
-      .overlay.active {
-        display: block;
-      }
-      .main-content {
-        padding: 20px 16px;
-      }
-      .lesson-card {
-        padding: 20px;
-      }
-      .meta-header h1 {
-        font-size: 1.3rem;
-      }
-      .sidebar-header .theme-toggle-btn {
-        display: none;
-      }
+      .sidebar.open { transform: translateX(0); }
+      .overlay.active { display: block; }
+      .main-content { padding: 20px 16px; }
+      .lesson-card { padding: 20px; }
+      .meta-header h1 { font-size: 1.3rem; }
+      .sidebar-header .theme-toggle-btn { display: none; }
     }
   </style>
 </head>
@@ -243,10 +292,9 @@
   <!-- 手機端頂部列 -->
   <div class="mobile-header">
     <button class="menu-toggle-btn" onclick="toggleSidebar()" aria-label="選單">☰</button>
-    <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeBtnMobile">🌙</button>
+    <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeBtnMobile">深色</button>
   </div>
 
-  <!-- 背景遮罩 -->
   <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
   <!-- 側邊欄 -->
@@ -254,10 +302,28 @@
     <div class="sidebar-header">
       <div class="sidebar-title-row">
         <h2>📚 每日國學筆記</h2>
-        <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeBtnDesktop">🌙 深色</button>
+        <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeBtnDesktop">深色</button>
       </div>
-      <input type="text" id="searchInput" class="search-input" placeholder="搜尋典故、出處或關鍵字..." oninput="filterTabs()">
+      <input type="text" id="searchInput" class="search-input" placeholder="搜尋典故、出處、關鍵字..." oninput="filterTabs()">
+      
+      <!-- 主題標籤列（已移除前綴符號） -->
+      <div class="tag-bar" id="tagBar">
+        <button class="tag-btn active" onclick="selectTag('ALL')">全部</button>
+        <button class="tag-btn" onclick="selectTag('組織治理')">組織治理</button>
+        <button class="tag-btn" onclick="selectTag('資源戰略')">資源戰略</button>
+        <button class="tag-btn" onclick="selectTag('溝通說服')">溝通說服</button>
+        <button class="tag-btn" onclick="selectTag('識人風控')">識人風控</button>
+        <button class="tag-btn" onclick="selectTag('防蒙蔽')">防蒙蔽</button>
+        <button class="tag-btn" onclick="selectTag('梯隊建構')">梯隊建構</button>
+      </div>
     </div>
+
+    <!-- 上次閱讀提示條 -->
+    <div class="bookmark-banner" id="bookmarkBanner" style="display: none;">
+      <span>📌 上次閱讀至第 <strong id="lastLessonNum">--</strong> 課</span>
+      <button class="bookmark-btn" onclick="jumpToLastRead()">立即前往 →</button>
+    </div>
+
     <ul class="tab-list" id="tabList"></ul>
   </div>
 
@@ -269,8 +335,18 @@
   <script>
     let ALL_LESSONS = [];
     let currentTabId = 1;
+    let selectedTag = 'ALL';
 
-    // 1. 深色模式切換邏輯
+    // 自動關鍵字歸類字典
+    const CATEGORY_KEYWORDS = {
+      '組織治理': ['二柄', '審官', '權限', '制度', '治理', '授權', '無為', '主道'],
+      '資源戰略': ['因利', '利益', '撥款', '資源', '投資', '對賭', '對齊'],
+      '溝通說服': ['計深遠', '觸龍', '說服', '迂迴', '談判', '共情', '樞言'],
+      '識人風控': ['才德', '智伯', '識人', '道德風險', '雙簽', '選擇人才'],
+      '防蒙蔽': ['三鏡', '以人為鏡', '參伍', '交叉驗證', '盲抽', '隱匿智能', '聽言視事'],
+      '梯隊建構': ['愛子', '接班', '戰功', '梯隊', '傳承', '長遠']
+    };
+
     function initTheme() {
       const savedTheme = localStorage.getItem('theme') || 'light';
       document.documentElement.setAttribute('data-theme', savedTheme);
@@ -289,15 +365,14 @@
       const desktopBtn = document.getElementById('themeBtnDesktop');
       const mobileBtn = document.getElementById('themeBtnMobile');
       if (theme === 'dark') {
-        if (desktopBtn) desktopBtn.innerHTML = '☀️ 淺色';
-        if (mobileBtn) mobileBtn.innerHTML = '☀️';
+        if (desktopBtn) desktopBtn.innerHTML = '淺色';
+        if (mobileBtn) mobileBtn.innerHTML = '淺色';
       } else {
-        if (desktopBtn) desktopBtn.innerHTML = '🌙 深色';
-        if (mobileBtn) mobileBtn.innerHTML = '🌙';
+        if (desktopBtn) desktopBtn.innerHTML = '深色';
+        if (mobileBtn) mobileBtn.innerHTML = '深色';
       }
     }
 
-    // 2. 手機版選單邏輯
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
       const overlay = document.getElementById('overlay');
@@ -312,7 +387,21 @@
       overlay.classList.remove('active');
     }
 
-    // 3. 資料載入邏輯
+    // 自動補齊標籤邏輯
+    function attachAutoTags(item) {
+      if (item.tags && Array.isArray(item.tags) && item.tags.length > 0) return item.tags;
+      const tags = new Set();
+      const fullText = (item.title + ' ' + JSON.stringify(item.quotes) + ' ' + JSON.stringify(item.mindset)).toLowerCase();
+      
+      for (const [cat, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+        if (keywords.some(kw => fullText.includes(kw.toLowerCase()))) {
+          tags.add(cat);
+        }
+      }
+      if (tags.size === 0) tags.add('組織治理');
+      return Array.from(tags);
+    }
+
     async function fetchJsonFile(fileName) {
       try {
         const res = await fetch(`./lessons/${fileName}?v=` + Date.now());
@@ -329,15 +418,9 @@
       initTheme();
 
       const filesToLoad = [
-        '1-15.json',
-        '16-30.json',
-        '31-45.json',
-        '46-60.json',
-        '61-72.json',
-        '61-75.json'
+        '1-15.json', '16-30.json', '31-45.json', '46-60.json', '61-72.json', '61-75.json'
       ];
 
-      // 自動產出所有可能的單檔與動態區間大包（如 83-91.json, 92-100.json, 101-120.json...）
       for (let i = 61; i <= 500; i++) {
         filesToLoad.push(`${i}.json`);
         for (let j = i + 1; j <= i + 30; j++) {
@@ -355,18 +438,51 @@
         const map = new Map();
         ALL_LESSONS.forEach(item => {
           if (item && item.id !== undefined) {
+            item.tags = attachAutoTags(item);
             map.set(Number(item.id), item);
           }
         });
         
         ALL_LESSONS = Array.from(map.values()).sort((a, b) => b.id - a.id);
         
+        checkLastReadBookmark();
+
         currentTabId = ALL_LESSONS[0].id;
         renderTabs(ALL_LESSONS);
-        selectTab(currentTabId);
+        selectTab(currentTabId, false);
       } else {
         document.getElementById('mainContent').innerHTML = '<div class="empty-state">尚未讀取到資料，請確認 lessons/ 目錄。</div>';
       }
+    }
+
+    // 書籤邏輯
+    function checkLastReadBookmark() {
+      const lastId = localStorage.getItem('lastReadLessonId');
+      if (lastId && ALL_LESSONS.some(l => l.id === Number(lastId))) {
+        document.getElementById('lastLessonNum').innerText = lastId;
+        document.getElementById('bookmarkBanner').style.display = 'flex';
+      }
+    }
+
+    function jumpToLastRead() {
+      const lastId = Number(localStorage.getItem('lastReadLessonId'));
+      if (lastId) {
+        selectTab(lastId);
+        closeSidebar();
+      }
+    }
+
+    function selectTag(tagName) {
+      selectedTag = tagName;
+      const btns = document.querySelectorAll('.tag-btn');
+      btns.forEach(b => {
+        if (b.innerText === tagName || (tagName === 'ALL' && b.innerText === '全部')) {
+          b.classList.add('active');
+        } else {
+          b.classList.remove('active');
+        }
+      });
+      filterTabs();
     }
 
     function renderTabs(data) {
@@ -379,27 +495,73 @@
           selectTab(item.id);
           closeSidebar();
         };
-        li.innerHTML = `<div class="lesson-num">第 ${item.id} 課 • ${item.date}</div><div class="lesson-title">${item.title}</div>`;
+
+        let tagBadges = '';
+        if (item.tags) {
+          tagBadges = item.tags.map(t => `<span class="mini-tag">${t}</span>`).join('');
+        }
+
+        li.innerHTML = `
+          <div class="lesson-num"><span>第 ${item.id} 課</span><span>${item.date}</span></div>
+          <div class="lesson-title">${item.title}</div>
+          <div class="item-tags">${tagBadges}</div>
+        `;
         tabList.appendChild(li);
       });
     }
 
-    function selectTab(id) {
+    function selectTab(id, saveBookmark = true) {
       currentTabId = id;
       const lesson = ALL_LESSONS.find(l => l.id === id);
-      renderTabs(ALL_LESSONS);
+      
+      if (saveBookmark) {
+        localStorage.setItem('lastReadLessonId', id);
+        checkLastReadBookmark();
+      }
+
+      filterTabs();
+
       if (!lesson) return;
       const mainContent = document.getElementById('mainContent');
       let quotesHtml = '';
       lesson.quotes.forEach(q => {
         quotesHtml += `<div class="quote-item"><strong>【出處】</strong> ${q.source}<br><strong>【原文】</strong> ${q.text}<br><strong>【白話解讀】</strong> ${q.meaning}<div class="app-box"><strong>💼 現代交流與商務應用：</strong><br>${q.app}</div></div>`;
       });
-      mainContent.innerHTML = `<div class="lesson-card"><div class="meta-header"><span class="date-badge">第 ${lesson.id} 課 ｜ ${lesson.date}</span><h1>${lesson.title}</h1></div><div class="section-block"><div class="section-title">📄 國學經典典故（談吐墨水）</div><div class="quote-box">${quotesHtml}</div></div><div class="section-block"><div class="section-title">👑 心術與權謀解析</div><div class="mindset-box"><strong>【${lesson.mindset.title}】</strong><br><br>${lesson.mindset.content}</div></div></div>`;
+
+      let cardTagsHtml = '';
+      if (lesson.tags) {
+        cardTagsHtml = lesson.tags.map(t => `<span class="card-tag-item">${t}</span>`).join('');
+      }
+
+      mainContent.innerHTML = `
+        <div class="lesson-card">
+          <div class="meta-header">
+            <span class="date-badge">第 ${lesson.id} 課 ｜ ${lesson.date}</span>
+            <h1>${lesson.title}</h1>
+            <div class="card-tags">${cardTagsHtml}</div>
+          </div>
+          <div class="section-block">
+            <div class="section-title">📄 國學經典典故（談吐墨水）</div>
+            <div class="quote-box">${quotesHtml}</div>
+          </div>
+          <div class="section-block">
+            <div class="section-title">👑 心術與權謀解析</div>
+            <div class="mindset-box"><strong>【${lesson.mindset.title}】</strong><br><br>${lesson.mindset.content}</div>
+          </div>
+        </div>`;
     }
 
     function filterTabs() {
       const query = document.getElementById('searchInput').value.toLowerCase();
-      const filtered = ALL_LESSONS.filter(item => item.title.toLowerCase().includes(query) || String(item.id).toLowerCase().includes(query) || item.quotes.some(q => q.text.toLowerCase().includes(query) || q.source.toLowerCase().includes(query)));
+      const filtered = ALL_LESSONS.filter(item => {
+        const matchesQuery = item.title.toLowerCase().includes(query) || 
+                             String(item.id).toLowerCase().includes(query) || 
+                             item.quotes.some(q => q.text.toLowerCase().includes(query) || q.source.toLowerCase().includes(query));
+        
+        const matchesTag = selectedTag === 'ALL' || (item.tags && item.tags.includes(selectedTag));
+
+        return matchesQuery && matchesTag;
+      });
       renderTabs(filtered);
     }
 
