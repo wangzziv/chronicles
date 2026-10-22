@@ -364,7 +364,6 @@
       overlay.classList.remove('active');
     }
 
-    // 輕量化標籤對應表 (不再對幾萬字的全文做字串模糊掃描，只對 Title 進行精準匹配，效能提升 100 倍)
     function attachAutoTags(item) {
       if (item.tags && Array.isArray(item.tags) && item.tags.length > 0) return item.tags;
       const tags = [];
@@ -396,21 +395,18 @@
     async function initApp() {
       initTheme();
 
-      // 只有明確存在的檔案才會被發起 HTTP 請求，絕不做多餘探測
-      const filesToLoad = [
-        '1-15.json', 
-        '16-30.json', 
-        '31-45.json', 
-        '46-60.json', 
-        '61-72.json',
-        '83-91.json'
-      ];
-
-      // 早期單檔只列出實際存在的 73 到 82 課，絕不往後發送不存在的請求
-      for (let i = 73; i <= 82; i++) {
-        filesToLoad.push(`${i}.json`);
+      // 1. 先讀取 manifest.json 精準取得檔案名單（零浪費請求）
+      let filesToLoad = [];
+      const manifest = await fetchJsonFile('manifest.json');
+      
+      if (manifest && Array.isArray(manifest)) {
+        filesToLoad = manifest;
+      } else {
+        // Fallback 預設清單
+        filesToLoad = ['1-15.json', '16-30.json', '31-45.json', '46-60.json', '61-72.json', '83-91.json'];
       }
 
+      // 2. 一口氣並行載入精準檔案
       const results = await Promise.all(filesToLoad.map(file => fetchJsonFile(file)));
 
       results.forEach(items => {
