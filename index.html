@@ -328,20 +328,21 @@
     async function initApp() {
       initTheme();
 
-      // 預設的大包 / 區間檔清單（未來有新的 92-100.json、101-120.json，直接往這個陣列新增即可）
       const filesToLoad = [
         '1-15.json',
         '16-30.json',
         '31-45.json',
         '46-60.json',
         '61-72.json',
-        '61-75.json',
-        '83-91.json'  // 👈 已新增 83-91 區間包
+        '61-75.json'
       ];
 
-      // 相容舊的單課獨立檔案（73.json ~ 82.json 等）
-      for (let i = 61; i <= 200; i++) {
+      // 自動產出所有可能的單檔與動態區間大包（如 83-91.json, 92-100.json, 101-120.json...）
+      for (let i = 61; i <= 500; i++) {
         filesToLoad.push(`${i}.json`);
+        for (let j = i + 1; j <= i + 30; j++) {
+          filesToLoad.push(`${i}-${j}.json`);
+        }
       }
 
       const results = await Promise.all(filesToLoad.map(file => fetchJsonFile(file)));
