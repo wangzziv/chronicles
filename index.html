@@ -126,26 +126,24 @@
       color: var(--text-main);
     }
 
+    /* 關鍵修復：改成多行換行自適應，不再被裁切 */
     .tag-bar {
       display: flex;
+      flex-wrap: wrap;
       gap: 6px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-      scrollbar-width: none;
+      padding-top: 2px;
     }
-    .tag-bar::-webkit-scrollbar { display: none; }
     
     .tag-btn {
       background-color: var(--tag-bg);
       color: var(--text-main);
       border: none;
-      padding: 4px 10px;
+      padding: 5px 10px;
       border-radius: 14px;
       font-size: 0.78rem;
       cursor: pointer;
       white-space: nowrap;
       transition: all 0.2s;
-      flex-shrink: 0;
     }
     .tag-btn:hover { opacity: 0.85; }
     .tag-btn.active {
@@ -395,18 +393,15 @@
     async function initApp() {
       initTheme();
 
-      // 1. 先讀取 manifest.json 精準取得檔案名單（零浪費請求）
       let filesToLoad = [];
       const manifest = await fetchJsonFile('manifest.json');
       
       if (manifest && Array.isArray(manifest)) {
         filesToLoad = manifest;
       } else {
-        // Fallback 預設清單
         filesToLoad = ['1-15.json', '16-30.json', '31-45.json', '46-60.json', '61-72.json', '83-91.json'];
       }
 
-      // 2. 一口氣並行載入精準檔案
       const results = await Promise.all(filesToLoad.map(file => fetchJsonFile(file)));
 
       results.forEach(items => {
